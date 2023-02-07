@@ -1,0 +1,9 @@
+const mongoose = require('mongoose')
+require('dotenv').config()
+const {MONGOOSE_URL} = process.env
+
+
+mongoose.connect(MONGOOSE_URL)
+  .then(() => console.log('Connected!'));
+
+module.exports = mongoose
