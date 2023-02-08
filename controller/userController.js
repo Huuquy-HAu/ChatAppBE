@@ -2,7 +2,6 @@ const UserModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_PASSWORD, JWT_EXPIRED_IN } = process.env;
-console.log(5, JWT_PASSWORD, JWT_EXPIRED_IN);
 
 exports.getAllUser = async (req, res) => {
   try {
