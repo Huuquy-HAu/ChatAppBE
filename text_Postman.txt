@@ -1,0 +1,23 @@
+Create roomChat
+POST /api/roomChat
+{   
+    "type": "EMPTY-USER",
+    "nameRoom": "test Name room 6"
+}   
+
+
+{   
+    "type": "ADD-USER",
+    "userID":["12345","676357584","123212","495845"],
+    "roomChatID":"63e2912c22e290d200fb3244"
+}
+
+
+{   
+    "type": "REMOVE-USER",
+    "userID":["12345","676357584","123212","495845"],
+    "roomChatID":"63e2912c22e290d200fb3244"
+}
+
+
+
