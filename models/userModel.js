@@ -12,6 +12,11 @@ const UserSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
+    avatar:{
+      type:String,
+      default:'https://class.nodemy.vn/api/public/images/logo.png?1675910771501'
+    }
+    ,
     password: {
       type: String,
       unique: true,
