@@ -10,58 +10,31 @@ let faill = {
     mess: 'er server',
     resole: null
 }
+const single = "Single Room"
+const mutil = 'Multil Room'
 
 const createChatRoomServices = async (body) => {
     try {
+        // console.log(">>> body user:",body.userId);
 
-        // Tạo nhóm chát không có thành viên 
-        if (body.type === 'EMPTY-USER') {
-            success.resole = await RoomChatModel.create(body)
-            // console.log('>>> resole:', success);
+        let roomChat = await RoomChatModel.create(body)
+        // console.log(">>> roomChat:", roomChat);
 
+        if (roomChat.listUser.length < 2) {
+            roomChat.remove()
+            success.status = 400
+            success.resole = 'room chat ko hợp lệ'
             return success
         }
 
-        // Add thành viên nhóm
-        if (body.type === 'ADD-USER') {
-            // console.log('>>> check data:',body);
-
-            let myRoom = await RoomChatModel.findById(body.roomChatID)
-            // console.log('>>> myRoom: ',myRoom );
-
-            for (let i = 0; i < body.userID.length; i++) {
-                if (myRoom.listUser.indexOf(body.userID[i]) === -1) {
-                    myRoom.listUser.push(body.userID[i])
-                }
-            }
-            // console.log(">>> myRoom:", myRoom);
-
-            success.resole = await myRoom.save()
-            return success
+        if (roomChat.listUser.length === 2) {
+            roomChat.type = single
+            roomChat.save()
         }
 
-        // Xoá thành viên trong nhóm
-        if (body.type === 'REMOVE-USER') {
-            // console.log('>>> check data:', body);
 
-            let myRoom = await RoomChatModel.findById(body.roomChatID)
-            // console.log('>>> myRoom: ',myRoom );
-
-            for (let i = 0; i < body.userID.length; i++) {
-                if (myRoom.listUser.indexOf(body.userID[i]) === -1) {
-                    success.status = 400;
-                    success.resole = 'id bạn nhập ko có trong nhóm chát!';
-                    return success 
-                }
-                myRoom.listUser.remove(body.userID[i])
-            }
-            // console.log(">>> myRoom:", myRoom);
-            // console.log('>>> success:',success);
-            
-            success.resole = await myRoom.save()
-            return success
-
-        }
+        success.resole = roomChat
+        return success
 
 
     } catch (error) {
@@ -72,6 +45,55 @@ const createChatRoomServices = async (body) => {
     }
 }
 
+
+const updateUserRoomServices = async (body) => {
+    // console.log(">>> body:", body);
+    try {
+        const myRoom = await RoomChatModel.findById(body.roomID)
+
+        for (let i = 0; i < body.userID.length; i++) {
+            if (myRoom.listUser.indexOf(body.userID[i]) === -1) {
+                myRoom.listUser.push(body.userID[i])
+            }
+        }
+
+        myRoom.type = mutil
+
+        success.resole = await myRoom.save()
+        return success
+    } catch (error) {
+        faill.resole = error
+        console.log(">>> faill:", faill);
+
+        return faill
+    }
+}
+
+const removeUserRoomService = async (body) => {
+    try {
+        // console.log(">>> roomChatID: ", body.roomChatID);
+        let myRoom = await RoomChatModel.findById(body.roomChatID).exec()
+        // console.log(">>> myRoom:", myRoom)  ;
+
+        for (let i = 0; i < body.userID.length; i++) {
+            if (myRoom.listUser.indexOf(body.userID[i]) === -1) {
+                success.status = 400;
+                success.resole = 'id bạn nhập ko có trong nhóm chát!';
+                return success
+            }
+            myRoom.listUser.remove(body.userID[i])
+        }
+
+        success.resole = await myRoom.save()
+        return success
+
+    } catch (error) {
+        console.log(error);
+        faill.resole = error
+        return faill
+    }
+
+}
 
 const getAllRoomChatService = async () => {
     try {
@@ -95,4 +117,5 @@ const deleteChatRoomService = async (params) => {
     }
 }
 
-module.exports = { createChatRoomServices, getAllRoomChatService, deleteChatRoomService }
+
+module.exports = { removeUserRoomService, updateUserRoomServices, createChatRoomServices, getAllRoomChatService, deleteChatRoomService }

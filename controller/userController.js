@@ -1,5 +1,5 @@
 const UserModel = require("../models/userModel");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_PASSWORD, JWT_EXPIRED_IN } = process.env;
 console.log(5, JWT_PASSWORD, JWT_EXPIRED_IN);
