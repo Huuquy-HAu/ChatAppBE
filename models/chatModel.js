@@ -19,6 +19,8 @@ const ChatSchema = new mongoose.Schema({
         type:String,
         ref:'User'
     }]
+    
+    
 }, {collection:'Chat'})
 
 const ChatModel = mongoose.model('Chat', ChatSchema)

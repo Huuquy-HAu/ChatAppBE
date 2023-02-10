@@ -1,6 +1,6 @@
 const ChatModel = require('../models/chatModel')
 
-exports.getAllChat = async (req,res) => {
+exports.getAllChatForRoom = async (req,res) => {
     try {
         const data = await ChatModel.find({
             idRoomChat: req.params.idRoom

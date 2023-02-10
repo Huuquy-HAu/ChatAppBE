@@ -7,14 +7,11 @@ const getAllRoomChatController = async (req, res) => {
     res.status(data.status).json(data)
 }
 
-
 const postRoomChatController = async (req, res) => {
     const data = await createChatRoomServices(req.body)
-    console.log('>>> data.resole:',data);
 
     res.status(data.status).json(data)
 }
-
 
 const deleteRoomChatController = async (req, res) => {
     const data = await deleteChatRoomService(req.params)

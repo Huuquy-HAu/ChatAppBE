@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
-const {getAllChat , deleteOneChat , createOneChat} = require('../controller/chatController')
+const {getAllChatForRoom , deleteOneChat , createOneChat} = require('../controller/chatController')
 
-router.get('/:idRoom', getAllChat )
+router.get('/:idRoom', getAllChatForRoom )
 
 router.post('/' , createOneChat)
 
