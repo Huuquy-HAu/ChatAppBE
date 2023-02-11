@@ -10,8 +10,8 @@ let faill = {
     mess: 'er server',
     resole: null
 }
-const single = "Single Room"
-const mutil = 'Multil Room'
+const single = 1
+const mutil = 2
 
 
 const createChatRoomServices = async (body) => {
@@ -33,7 +33,6 @@ const createChatRoomServices = async (body) => {
             roomChat.save()
         }
 
-
         success.resole = roomChat
         return success
 
@@ -51,7 +50,7 @@ const updateUserRoomServices = async (body,params) => {
     // console.log(">>> params:", params);
     try {
         const myRoom = await RoomChatModel.findById(params.idRoomchat)
-        console.log('>>> myRoom: ', myRoom);
+        // console.log('>>> myRoom: ', myRoom);
 
         // kiểm tra có người dùng có nhập User 
         if(body.userID.length === 0) {
@@ -87,6 +86,13 @@ const removeUserRoomService = async (body,params) => {
     // console.log(params);
 
     try {
+        if(body.userID.length === 0){
+            faill.status = 400
+            faill.mess = 'bạn chưa chọn người dùng !'
+            const newfaill = JSON.stringify(faill)
+            throw newfaill
+        }
+
         let myRoom = await RoomChatModel.findById(params.idRoomChat)
         console.log(">>> myRoom:", myRoom)  ;
 
@@ -98,6 +104,17 @@ const removeUserRoomService = async (body,params) => {
                 throw newFaill
             }
             myRoom.listUser.remove(body.userID[i])
+        }
+
+        if(myRoom.listUser.length < 2 ){
+            console.log(">>> myRoom:",myRoom);
+            myRoom.remove()
+            success.resole = 'bạn đã xoá phòng chát của bạn !';
+            return success
+        }
+
+        if(myRoom.listUser.length === 2 ){
+            myRoom.type = single
         }
 
         success.resole = await myRoom.save()

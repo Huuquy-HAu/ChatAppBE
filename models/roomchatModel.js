@@ -9,7 +9,7 @@ const RoomChatSchema = new mongoose.Schema({
         type:String,
         ref:'User'
     }],
-    type:{type:String, default:'Multil Room'}
+    type:{type:Number, default:1}   // 1 là single room , 2 là mutil room
 
 },{collection:'RoomChat'})
 
