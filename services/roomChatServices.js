@@ -13,6 +13,7 @@ let faill = {
 const single = "Single Room"
 const mutil = 'Multil Room'
 
+
 const createChatRoomServices = async (body) => {
     try {
         // console.log(">>> body user:",body.userId);
@@ -45,12 +46,22 @@ const createChatRoomServices = async (body) => {
     }
 }
 
-
-const updateUserRoomServices = async (body) => {
+const updateUserRoomServices = async (body,params) => {
     // console.log(">>> body:", body);
+    // console.log(">>> params:", params);
     try {
-        const myRoom = await RoomChatModel.findById(body.roomID)
+        const myRoom = await RoomChatModel.findById(params.idRoomchat)
+        console.log('>>> myRoom: ', myRoom);
 
+        // kiểm tra có người dùng có nhập User 
+        if(body.userID.length === 0) {
+            faill.status = 400
+            faill.mess = "mời bạn chon người !"
+            const newFaill =  JSON.stringify(faill)
+            throw newFaill
+        }
+
+        //kiểm tra lọc trùng !
         for (let i = 0; i < body.userID.length; i++) {
             if (myRoom.listUser.indexOf(body.userID[i]) === -1) {
                 myRoom.listUser.push(body.userID[i])
@@ -61,7 +72,9 @@ const updateUserRoomServices = async (body) => {
 
         success.resole = await myRoom.save()
         return success
+        
     } catch (error) {
+        console.log(">>> error: ", error);
         faill.resole = error
         console.log(">>> faill:", faill);
 
@@ -69,23 +82,28 @@ const updateUserRoomServices = async (body) => {
     }
 }
 
-const removeUserRoomService = async (body) => {
+const removeUserRoomService = async (body,params) => {
+    // console.log(body);
+    // console.log(params);
+
     try {
-        // console.log(">>> roomChatID: ", body.roomChatID);
-        let myRoom = await RoomChatModel.findById(body.roomChatID).exec()
-        // console.log(">>> myRoom:", myRoom)  ;
+        let myRoom = await RoomChatModel.findById(params.idRoomChat)
+        console.log(">>> myRoom:", myRoom)  ;
 
         for (let i = 0; i < body.userID.length; i++) {
             if (myRoom.listUser.indexOf(body.userID[i]) === -1) {
-                success.status = 400;
-                success.resole = 'id bạn nhập ko có trong nhóm chát!';
-                return success
+                faill.status = 400;
+                faill.mess = 'người dùng bạn nhập ko có trong nhóm chát!';
+                const newFaill =  JSON.stringify(faill)
+                throw newFaill
             }
             myRoom.listUser.remove(body.userID[i])
         }
 
         success.resole = await myRoom.save()
+        // success.resole = 'kết nối thành công !'
         return success
+
 
     } catch (error) {
         console.log(error);
@@ -95,9 +113,10 @@ const removeUserRoomService = async (body) => {
 
 }
 
-const getAllRoomChatService = async () => {
+const getAllRoomChatService = async (params) => {
+    console.log(">>> params:",params);
     try {
-        success.resole = await RoomChatModel.find()
+        success.resole = await RoomChatModel.findById(params.idUsser)
         return success
 
     } catch (error) {
@@ -105,7 +124,6 @@ const getAllRoomChatService = async () => {
         return faill
     }
 }
-
 
 const deleteChatRoomService = async (params) => {
     try {
