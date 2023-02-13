@@ -8,6 +8,4 @@ router.post('/' , createOneChat)
 
 router.delete('/:idChat', deleteOneChat)
 
-
-
 module.exports = router

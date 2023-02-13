@@ -8,7 +8,9 @@ const RoomChatSchema = new mongoose.Schema({
     listUser: [{
         type:String,
         ref:'User'
-    }]
+    }],
+    type:{type:String, default:'Multil Room'}
+
 },{collection:'RoomChat'})
 
 RoomChatSchema.plugin(mongoose_delete,{ overrideMethods: 'all' });

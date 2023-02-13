@@ -1,5 +1,5 @@
 const UserModel = require("../models/userModel");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_PASSWORD, JWT_EXPIRED_IN } = process.env;
 
@@ -43,7 +43,7 @@ exports.logIn = async (req, res) => {
     if (!checkPassWord) return res.status(400).json("wrong password");
 
     delete checkUser._doc.password;
-    const token = jwt.sign({ checkUser }, JWT_PASSWORD, {
+    const token = await jwt.sign({ checkUser }, JWT_PASSWORD, {
       expiresIn: JWT_EXPIRED_IN,
     });
     console.log(46, token);

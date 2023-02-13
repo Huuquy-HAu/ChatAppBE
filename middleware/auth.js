@@ -14,13 +14,14 @@ exports.checkLogin = async (req, res, next) => {
     //     res.status(400).json({ mess: "chua dang nhap" });
     return res
       .status(400)
-      .json({ mess: "chua dang nhap" })
-      .redirect("/sign-in");
+      .json({ mess: "chua dang nhap" })      
   }
   try {
     let data = jwt.verify(cookieUser, JWT_PASSWORD);
     console.log(10, data);
-    if (!data) return res.redirect("/sign-in");
+    if (!data) {
+      res.status(500).json('error')
+    }
     req.user = data.checkUser;
     next();
   } catch (error) {
