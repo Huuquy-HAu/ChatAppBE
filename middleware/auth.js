@@ -12,12 +12,11 @@ exports.checkLogin = async (req, res, next) => {
       } else {
         const user = await UserModel.findOne({ _id: decodedToken.id });
         if (user) res.json({ status: true, user: user.gmail });
-
         next();
       }
     });
   } else {
-    res.json({ status: false });
+    res.redirect("/sign-in");
   }
 };
 // const token =
