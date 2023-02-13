@@ -21,6 +21,7 @@ const createChatRoomServices = async (body) => {
         let roomChat = await RoomChatModel.create(body)
         // console.log(">>> roomChat:", roomChat);
 
+        //kiểm tra người dùng trong phòng chát phải lớn hơn 2 
         if (roomChat.listUser.length < 2) {
             roomChat.remove()
             success.status = 400
@@ -28,6 +29,7 @@ const createChatRoomServices = async (body) => {
             return success
         }
 
+        //kiểm tra phòng chát là chát 1:1 hay chat nhóm
         if (roomChat.listUser.length === 2) {
             roomChat.type = single
             roomChat.save()
@@ -60,7 +62,7 @@ const updateUserRoomServices = async (body,params) => {
             throw newFaill
         }
 
-        //kiểm tra lọc trùng !
+        //kiểm tra người dùng có bị trùng tên ko ?
         for (let i = 0; i < body.userID.length; i++) {
             if (myRoom.listUser.indexOf(body.userID[i]) === -1) {
                 myRoom.listUser.push(body.userID[i])
@@ -94,7 +96,7 @@ const removeUserRoomService = async (body,params) => {
         }
 
         let myRoom = await RoomChatModel.findById(params.idRoomChat)
-        console.log(">>> myRoom:", myRoom)  ;
+        // console.log(">>> myRoom:", myRoom)  ;
 
         for (let i = 0; i < body.userID.length; i++) {
             if (myRoom.listUser.indexOf(body.userID[i]) === -1) {
