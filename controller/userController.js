@@ -22,6 +22,7 @@ exports.getAllUser = async (req, res) => {
 
 exports.createNewUser = async (req, res) => {
   try {
+    console.log(25, req.body);
     const check = await UserModel.findOne({ userName: req.body.userName });
     if (check) return res.status(400).json({ mess: "username da ton tai" });
 
@@ -36,6 +37,7 @@ exports.createNewUser = async (req, res) => {
       password: password,
     });
     // const token = createToken(user._id);
+
     // // res.cookie("chat", token, { expiresIn: "1d" });
     // res.cookie("chat", token, {
     //   withCredentials: true,
@@ -123,6 +125,7 @@ exports.changeUserPassword = async (req, res) => {
     );
     // if (!changePass.matchedCount)
     //   return res.status(400).json({ mess: "wrong gmail" });
+
     res.status(200).json({ mess: "change password thanh cong", changePass });
   } catch (error) {
     console.log(error);

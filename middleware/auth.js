@@ -19,10 +19,6 @@ exports.checkLogin = async (req, res, next) => {
     res.redirect("/sign-in");
   }
 };
-// const token =
-//   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzZTMwZWUzNTE3YTlmZjZjNzYyMmUzOCIsImlhdCI6MTY3NjI2NzczOCwiZXhwIjoxNjc2NTI2OTM4fQ.HG5LeE96tad8Rbd7rTn3ImIg-xKMUVOJ0O-q0y2tdRg";
-// const check = jwt.verify(token, JWT_PASSWORD);
-// console.log(233333333333, check);
 exports.checkAdmin = async (req, res, next) => {
   if (req.user.role !== "4") return res.redirect("/sign-in");
   next();
