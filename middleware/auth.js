@@ -8,18 +8,19 @@ exports.checkLogin = async (req, res, next) => {
   if (token) {
     jwt.verify(token, JWT_PASSWORD, async (err, decodedToken) => {
       if (err) {
-        res.redirect("/sign-in");
+        res.redirect("/users/sign-in");
       } else {
         const user = await UserModel.findOne({ _id: decodedToken.id });
         if (user) res.json({ status: true, user: user.gmail });
+        req.user = user;
         next();
       }
     });
   } else {
-    res.redirect("/sign-in");
+    res.redirect("/users/sign-in");
   }
 };
 exports.checkAdmin = async (req, res, next) => {
-  if (req.user.role !== "4") return res.redirect("/sign-in");
+  if (req.user.role !== "4") return res.redirect("users/sign-in");
   next();
 };
