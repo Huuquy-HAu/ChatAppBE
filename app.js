@@ -5,13 +5,12 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
 
-const winston = require('./config/winston')
+const winston = require("./config/winston");
 
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-const roomChatRouter = require('./routes/roomchatRoute')
-const chatRoute = require('./routes/chatRoute')
+var indexRouter = require("./routes/index");
+var usersRouter = require("./routes/users");
+const roomChatRouter = require("./routes/roomchatRoute");
+const chatRoute = require("./routes/chatRoute");
 
 var app = express();
 
@@ -24,6 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(
   cors({
     origin: ["http://localhost:3000"],

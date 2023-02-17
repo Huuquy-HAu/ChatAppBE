@@ -1,12 +1,12 @@
 // Import the winston library
-const winston = require('winston');
+const winston = require("winston");
 
 // Define the logging options
 const options = {
   transports: [
     new winston.transports.File({
-      level: 'info',
-      filename: './logs/app.log',
+      level: "info",
+      filename: "./logs/app.log",
       handleExceptions: true,
       json: true,
       maxsize: 5242880, // 5MB
@@ -14,7 +14,7 @@ const options = {
       colorize: false,
     }),
     new winston.transports.Console({
-      level: 'debug',
+      level: "debug",
       handleExceptions: true,
       json: false,
       colorize: true,

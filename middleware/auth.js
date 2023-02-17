@@ -8,18 +8,24 @@ exports.checkLogin = async (req, res, next) => {
   if (token) {
     jwt.verify(token, JWT_PASSWORD, async (err, decodedToken) => {
       if (err) {
-        res.redirect("/sign-in");
+        // res.redirect("/users/sign-in");
+        return res.status(500).json({ mess: "chưa đăng nhập!" });
       } else {
         const user = await UserModel.findOne({ _id: decodedToken.id });
-        if (user) res.json({ status: true, user: user.gmail });
+        if (user) res.json({ status: true });
+        req.user = user;
         next();
       }
     });
   } else {
-    res.redirect("/sign-in");
+    // res.redirect("/users/sign-in");
+    return res.status(500).json({ mess: "chưa đăng nhập!" });
   }
 };
 exports.checkAdmin = async (req, res, next) => {
-  if (req.user.role !== "4") return res.redirect("/sign-in");
+  if (req.user.role !== "4")
+    return res
+      .status(404)
+      .json({ mess: "Bạn không phải admin không có quyền truy cập !" });
   next();
 };
