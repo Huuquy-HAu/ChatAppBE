@@ -10,7 +10,7 @@ const {
   signIn,
   getOneUser,
   changeUserPassword,
-  updateProfile,
+  uploadAvatar,
 } = require("../controller/userController");
 const { checkLogIn, checkAdmin } = require("../middleware/auth");
 // const UserModel = require("../models/userModel");
@@ -45,25 +45,6 @@ router.get("/:id", getOneUser); //get one user
 router.post("/sign-up", createNewUser); //tạo mới user
 router.post("/sign-in", signIn); // đăng nhập
 router.put("/:id", changeUserPassword); // đổi mật khẩu
-// route.put('/upload-profile',uploadProfile);//đổi avatar
-router.post("/upload", upload.single("avatar"), async function (req, res) {
-  try {
-    const token = req.cookies["chat-app"];
-    const id = jwt.verify(token, JWT_PASSWORD);
-    const update = await UserModel.updateOne(
-      { _id: id.id },
-      { avatar: req.file.filename }
-    );
-    console.log(56, req.file);
-    console.log(57, req.body);
-    if (update.modifiedCount === 0) {
-      fs.unlinkSync(req.file.filename);
-    }
-    res.json({ mess: "ok", update });
-  } catch (error) {
-    res.status(500).json("server error" + error);
-  }
-});
-// router.put("/profile/:id", updateProfile);
+router.post("/upload", upload.single("avatar"), uploadAvatar); //đổi avatar
 
 module.exports = router;

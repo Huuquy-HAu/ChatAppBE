@@ -4,8 +4,8 @@ var router = express.Router();
 
 /* GET home page. */
 router.get("/", checkLogin, (req, res) => {
-  console.log(">>> req:", req);
-  res.send("đây là trang home");
+  console.log(">>> console.log file index.js", req.user._id.toString());
+  res.json(req.user);
 });
 
 router.get("/set-cookie", function (req, res, next) {

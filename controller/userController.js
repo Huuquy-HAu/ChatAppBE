@@ -22,33 +22,35 @@ exports.getAllUser = async (req, res) => {
 };
 
 exports.createNewUser = async (req, res) => {
+  const userName = req.body.userName;
+  const gmail = req.body.gmail;
+  const password = req.body.password;
+  const mailFormat = /^([a-zA-Z0-9_\.\-])+\@gmail.com/;
   try {
-    console.log(26, req.body);
-    const check = await UserModel.findOne({ userName: req.body.userName });
+    if (!userName || !gmail || !password) {
+      return res.status(400).json({ mess: "Không để trống thông tin !" });
+    } else if (!mailFormat.test(gmail)) {
+      return res.status(400).json({ mess: "Sai định dạng gmail !" });
+    } else if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ mess: "Mật khẩu ít nhất phải dài 6 ký tự !" });
+    }
+
+    const check = await UserModel.findOne({ userName: userName });
     if (check) return res.status(400).json({ mess: "username da ton tai" });
 
-    const checkGmail = await UserModel.findOne({ gmail: req.body.gmail });
+    const checkGmail = await UserModel.findOne({ gmail: gmail });
     if (checkGmail) return res.status(400).json({ mess: "gmail da ton tai" });
 
-    const password = await bcrypt.hash(req.body.password, 10);
+    const jwtPassword = await bcrypt.hash(password, 10);
 
     const user = await UserModel.create({
       userName: req.body.userName,
       gmail: req.body.gmail,
-      password: password,
+      password: jwtPassword,
     });
-    // const token = createToken(user._id);
 
-    // // res.cookie("chat-app", token, { expiresIn: "1d" });
-    // res.cookie("chat-app", token, {
-    //   withCredentials: true,
-    //   httpOnly: false,
-    //   maxAge: maxAge * 1000,
-    // });
-    // console.log(">>> req.cokkies: ", req.cookies);
-    // console.log(45, token);
-    // console.log(46, req.cookies.chat);
-    // res.status(201).json({ user: user._id, created: true });
     delete user._doc.password;
     res.status(200).json({ mess: "creater user success", user });
   } catch (error) {
@@ -135,17 +137,21 @@ exports.logOut = async (req, res) => {
   }
 };
 
-exports.updateProfile = async (req, res) => {
+exports.uploadAvatar = async (req, res) => {
   try {
     const token = req.cookies["chat-app"];
-    console.log(141, token);
     const id = jwt.verify(token, JWT_PASSWORD);
-    console.log(143, id.id);
-    console.log(144, req.body);
-    const user = await UserModel.findOne({ _id: req.params.id });
-    console.log(user);
-    res.status(200).json(user);
+    const update = await UserModel.updateOne(
+      { _id: id.id },
+      { avatar: req.file.path }
+    );
+    console.log(56, req.file);
+    console.log(57, req.body);
+    if (update.modifiedCount === 0) {
+      fs.unlinkSync(req.file.filename);
+    }
+    res.json({ mess: "ok", update });
   } catch (error) {
-    res.status(500).json({ mess: "server error", error });
+    res.status(500).json("server error" + error);
   }
 };
