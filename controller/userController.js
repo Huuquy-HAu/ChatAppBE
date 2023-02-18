@@ -98,13 +98,17 @@ exports.getOneUser = async (req, res) => {
   }
 };
 
-// exports.changeInformation = async(req,res) =>{
-//   try {
-//     const user = await UserModel.updateOne({userName:req.body.userName})
-//   } catch (error) {
-//     res.status(500).json({mess:'server error' , error})
-//   }
-// }
+exports.changeInformation = async (req, res) => {
+  try {
+    const user = await UserModel.updateOne(
+      { _id: req.params.id },
+      { phoneNumber: "0123456789" }
+    );
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ mess: "server error", error });
+  }
+};
 
 exports.changeUserPassword = async (req, res) => {
   try {
@@ -120,7 +124,7 @@ exports.changeUserPassword = async (req, res) => {
       { _id: checkUser._id },
       { password: bcrypt.hashSync(req.body.newPassword, 10) }
     );
-
+    // console.log(123, changePass);
     res.status(200).json({ mess: "change password thanh cong", changePass });
   } catch (error) {
     console.log(error);

@@ -13,9 +13,14 @@ exports.checkLogin = async (req, res, next) => {
       return res.status(400).json({ mess: "Chưa đăng nhập !" });
     } else {
       const user = await UserModel.findOne({ _id: id.id });
-      console.log(16, user);
-      req.user = user;
-      next();
+      if (!user) {
+        return res
+          .status(400)
+          .json({ mess: "token không hợp lệ, không tìm thấy người dùng !" });
+      } else {
+        req.user = user;
+        next();
+      }
     }
   } catch (error) {
     res.status(500).json({ mess: "server error", error });

@@ -11,6 +11,7 @@ const {
   getOneUser,
   changeUserPassword,
   uploadAvatar,
+  changeInformation,
 } = require("../controller/userController");
 const { checkLogIn, checkAdmin } = require("../middleware/auth");
 // const UserModel = require("../models/userModel");
@@ -46,5 +47,6 @@ router.post("/sign-up", createNewUser); //tạo mới user
 router.post("/sign-in", signIn); // đăng nhập
 router.put("/:id", changeUserPassword); // đổi mật khẩu
 router.post("/upload", upload.single("avatar"), uploadAvatar); //đổi avatar
+router.put("/changeInfomation/:id", changeInformation);
 
 module.exports = router;
