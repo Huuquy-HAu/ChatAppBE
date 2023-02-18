@@ -82,6 +82,7 @@ exports.signIn = async (req, res) => {
       mess: "log-in success",
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ mess: "server error", error });
   }
 };

@@ -1,11 +1,12 @@
 const router = require('express').Router()
+const { checkLogin } = require("../middleware/auth");
 const { removeUserRoomController,updateUserRoomChatController,getAllRoomChatController,postRoomChatController,deleteRoomChatController} = require('../controller/roomChatController')
 
 // GET chatROOM page (get all chatRoom)
 router.get('/roomChat/:idUsser',getAllRoomChatController)
 
 //Post create chatRoom
-router.post('/roomChat',postRoomChatController)
+router.post('/roomChat', checkLogin, postRoomChatController)
 
 //Pacth updateUser in chatRoom
 router.patch('/roomChat/updateUser/:idRoomchat',updateUserRoomChatController)

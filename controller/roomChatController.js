@@ -9,8 +9,9 @@ const getAllRoomChatController = async (req, res) => {
 }
 
 const postRoomChatController = async (req, res) => {
-    const data = await createChatRoomServices(req.body)
-    res.status(data.status).json(data)
+    
+    const data = await createChatRoomServices(req.user._id.toString(), req.body)
+    res.json(data)
 }
 
 const updateUserRoomChatController = async (req,res)=>{

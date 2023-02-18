@@ -1,4 +1,6 @@
+// const { logger } = require('../config/winston')
 const RoomChatModel = require('../models/roomchatModel')
+const UserModel = require('../models/userModel')
 
 let success = {
     status: 200,
@@ -14,26 +16,48 @@ const single = 1
 const mutil = 2
 
 
-const createChatRoomServices = async (body) => {
+const createChatRoomServices = async (idUser, body) => {
     try {
-        // console.log(">>> body user:",body.userId);
+        console.log(21,idUser, body.friend)
+        let idUsserFriend = await UserModel.findById(body.friend)
+        let idUsser = idUser
 
-        let roomChat = await RoomChatModel.create(body)
-        // console.log(">>> roomChat:", roomChat);
-
-        //kiểm tra người dùng trong phòng chát phải lớn hơn 2 
-        if (roomChat.listUser.length < 2) {
-            roomChat.remove()
-            success.status = 400
-            success.resole = 'room chat ko hợp lệ'
-            return success
+        //kiểm tra có ai tahy đổi id user thành id bất kỳ !
+        if (!idUsser) {
+            faill.status = 400;
+            faill.mess = '404 not found! ';
+            const newFaill = JSON.stringify(faill);
+            return newFaill
         }
 
-        //kiểm tra phòng chát là chát 1:1 hay chat nhóm
-        if (roomChat.listUser.length === 2) {
-            roomChat.type = single
-            roomChat.save()
+        //kiểm tra người dừng có hợp lệ ko (kiểm tra id người dùng có đúng hay ko ?)
+        if (!idUsserFriend) {
+            faill.status = 400;
+            faill.mess = 'đây ko phải là bạn của bạn !'
+            const newFaill = JSON.stringify(faill)
+            throw newFaill
         }
+
+        //kiểm tra xem roomChat đã được tạo hay chưa (chat đôi) !
+        let findRoomChat = await RoomChatModel.findOne({ 
+            $and: [
+                {type: 1},
+                { listUser: idUsser },
+                { listUser: body.friend }
+            ]
+        })
+
+        if (findRoomChat) {
+            faill.status = 400;
+            faill.mess = 'phòng chát này đã được tạo ! '
+            const newFaill = JSON.stringify(faill)
+            throw newFaill
+        }
+
+        let roomChat = await RoomChatModel.create({
+            nameRoom: body.nameRoom,
+            listUser: [idUsser, body.friend]
+        })
 
         success.resole = roomChat
         return success
@@ -47,7 +71,7 @@ const createChatRoomServices = async (body) => {
     }
 }
 
-const updateUserRoomServices = async (body,params) => {
+const updateUserRoomServices = async (body, params) => {
     // console.log(">>> body:", body);
     // console.log(">>> params:", params);
     try {
@@ -55,10 +79,10 @@ const updateUserRoomServices = async (body,params) => {
         // console.log('>>> myRoom: ', myRoom);
 
         // kiểm tra có người dùng có nhập User 
-        if(body.userID.length === 0) {
+        if (body.userID.length === 0) {
             faill.status = 400
             faill.mess = "mời bạn chon người !"
-            const newFaill =  JSON.stringify(faill)
+            const newFaill = JSON.stringify(faill)
             throw newFaill
         }
 
@@ -73,7 +97,7 @@ const updateUserRoomServices = async (body,params) => {
 
         success.resole = await myRoom.save()
         return success
-        
+
     } catch (error) {
         console.log(">>> error: ", error);
         faill.resole = error
@@ -83,12 +107,12 @@ const updateUserRoomServices = async (body,params) => {
     }
 }
 
-const removeUserRoomService = async (body,params) => {
+const removeUserRoomService = async (body, params) => {
     // console.log(body);
     // console.log(params);
 
     try {
-        if(body.userID.length === 0){
+        if (body.userID.length === 0) {
             faill.status = 400
             faill.mess = 'bạn chưa chọn người dùng !'
             const newfaill = JSON.stringify(faill)
@@ -102,20 +126,20 @@ const removeUserRoomService = async (body,params) => {
             if (myRoom.listUser.indexOf(body.userID[i]) === -1) {
                 faill.status = 400;
                 faill.mess = 'người dùng bạn nhập ko có trong nhóm chát!';
-                const newFaill =  JSON.stringify(faill)
+                const newFaill = JSON.stringify(faill)
                 throw newFaill
             }
             myRoom.listUser.remove(body.userID[i])
         }
 
-        if(myRoom.listUser.length < 2 ){
-            console.log(">>> myRoom:",myRoom);
+        if (myRoom.listUser.length < 2) {
+            console.log(">>> myRoom:", myRoom);
             myRoom.remove()
             success.resole = 'bạn đã xoá phòng chát của bạn !';
             return success
         }
 
-        if(myRoom.listUser.length === 2 ){
+        if (myRoom.listUser.length === 2) {
             myRoom.type = single
         }
 
@@ -133,12 +157,27 @@ const removeUserRoomService = async (body,params) => {
 }
 
 const getAllRoomChatService = async (params) => {
-    console.log(">>> params:",params);
+    console.log(">>> params:", params);
     try {
-        success.resole = await RoomChatModel.findById(params.idUsser)
+        if (params.idUsser === ':idUser') {
+            faill.status = 500;
+            faill.mess = 'ko vào được trang này'
+            const newFaill = JSON.stringify(faill)
+            throw newFaill
+        }
+        const data = await RoomChatModel.find({ nameUser: params.idUsser })
+        console.log(data);
+        if (data.length === 0) {
+            faill.status = 400;
+            faill.mess = 'ko tìm được tên này!'
+            const newFaill = JSON.stringify(faill)
+            throw newFaill
+        }
+        success.resole = data
         return success
 
     } catch (error) {
+        console.log(error);
         faill.resole = error
         return faill
     }
@@ -146,7 +185,7 @@ const getAllRoomChatService = async (params) => {
 
 const deleteChatRoomService = async (params) => {
     try {
-        success.resole = await RoomChatModel.deleteById(params.id)
+        success.resole = await RoomChatModel.deleteOne({_id: params.id})
         return success
     } catch (error) {
         faill.resole = error

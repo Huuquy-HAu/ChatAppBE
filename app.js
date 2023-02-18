@@ -5,7 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
 
-const winston = require("./config/winston");
+// const winston = require("./config/winston");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");

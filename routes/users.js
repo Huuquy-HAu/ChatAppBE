@@ -3,6 +3,7 @@ var router = express.Router();
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
+const multer = require("multer");
 const { JWT_PASSWORD } = process.env;
 const {
   getAllUser,
@@ -14,7 +15,7 @@ const {
 } = require("../controller/userController");
 const { checkLogIn, checkAdmin } = require("../middleware/auth");
 // const UserModel = require("../models/userModel");
-const multer = require("multer");
+
 const UserModel = require("../models/userModel");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
