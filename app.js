@@ -8,7 +8,7 @@ var cors = require("cors");
 // const winston = require("./config/winston");
 
 var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
+const usersRouter = require("./routes/users");
 const roomChatRouter = require("./routes/roomchatRoute");
 const chatRoute = require("./routes/chatRoute");
 
