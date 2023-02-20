@@ -19,7 +19,7 @@ const mutil = 2
 const createChatRoomServices = async (idUser, body) => {
     try {
         console.log(21,idUser, body.friend)
-        let idUsserFriend = await UserModel.findById(body.friend)
+        let idUserFriend = await UserModel.findById(body.friend)
         let idUsser = idUser
 
         //kiểm tra có ai tahy đổi id user thành id bất kỳ !
@@ -30,8 +30,9 @@ const createChatRoomServices = async (idUser, body) => {
             return newFaill
         }
 
-        //kiểm tra người dừng có hợp lệ ko (kiểm tra id người dùng có đúng hay ko ?)
-        if (!idUsserFriend) {
+        // console.log(">>> idUserFriend:", idUserFriend);
+        //kiểm tra người dừng có hợp lệ ko (kiểm tra id người dùng có đúng hay ko ? )
+        if (!idUserFriend) {
             faill.status = 400;
             faill.mess = 'đây ko phải là bạn của bạn !'
             const newFaill = JSON.stringify(faill)
@@ -47,9 +48,10 @@ const createChatRoomServices = async (idUser, body) => {
             ]
         })
 
+        // console.log(">>> findRoomChat:",findRoomChat);
         if (findRoomChat) {
             faill.status = 400;
-            faill.mess = 'phòng chát này đã được tạo ! '
+            faill.mess = 'phòng chát này đã được tạo !';
             const newFaill = JSON.stringify(faill)
             throw newFaill
         }
@@ -64,10 +66,11 @@ const createChatRoomServices = async (idUser, body) => {
 
 
     } catch (error) {
-        faill.resole = error
-        console.log(">>> faill:", faill);
 
-        return faill
+        return {
+            status: 500,
+            error
+        }
     }
 }
 
@@ -156,22 +159,14 @@ const removeUserRoomService = async (body, params) => {
 
 }
 
-const getAllRoomChatService = async (params) => {
-    console.log(">>> params:", params);
-    try {
-        if (params.idUsser === ':idUser') {
-            faill.status = 500;
-            faill.mess = 'ko vào được trang này'
-            const newFaill = JSON.stringify(faill)
-            throw newFaill
-        }
-        const data = await RoomChatModel.find({ nameUser: params.idUsser })
+const getAllRoomChatService = async (cookies) => {
+    console.log('>>> cookies:', cookies);
+    try {    
+        const data = await RoomChatModel.find({ listUser: cookies })
         console.log(data);
         if (data.length === 0) {
-            faill.status = 400;
-            faill.mess = 'ko tìm được tên này!'
-            const newFaill = JSON.stringify(faill)
-            throw newFaill
+            success.resole = 'bạn chưa nhắn tin với ai !'
+            return success          
         }
         success.resole = data
         return success
@@ -183,9 +178,9 @@ const getAllRoomChatService = async (params) => {
     }
 }
 
-const deleteChatRoomService = async (params) => {
+const deleteChatRoomService = async (cookies) => {
     try {
-        success.resole = await RoomChatModel.deleteOne({_id: params.id})
+        success.resole = await RoomChatModel.deleteOne({_id: cookies})
         return success
     } catch (error) {
         faill.resole = error

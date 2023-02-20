@@ -2,7 +2,7 @@ const { removeUserRoomService,updateUserRoomServices,getAllRoomChatService, crea
 
 const getAllRoomChatController = async (req, res) => {
 
-    const data = await getAllRoomChatService(req.params)
+    const data = await getAllRoomChatService(req.user._id.toString())
     // console.log(">>> data:", data);
 
     res.status(data.status).json(data)
@@ -27,8 +27,9 @@ const removeUserRoomController = async (req,res) =>{
 }
 
 const deleteRoomChatController = async (req, res) => {
-    const data = await deleteChatRoomService(req.params)
-    res.status(data.status).json(data)
+    console.log(">>> req.user:", req.user);
+    const data = await deleteChatRoomService(req.user._id)
+    res.json('đã kết nối thành công !')
 }
 
 
