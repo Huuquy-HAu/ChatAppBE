@@ -3,45 +3,52 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { logger } = require("../config/winston");
 const { JWT_PASSWORD, JWT_EXPIRED_IN } = process.env;
+const createError = require("http-errors");
+const MAIL_FORMAT = /^([a-zA-Z0-9_\.\-])+\@gmail.com/;
 
-const maxAge = 3 * 24 * 60 * 60;
 const createToken = (id) => {
   return jwt.sign({ id }, JWT_PASSWORD, {
-    expiresIn: maxAge,
+    expiresIn: JWT_EXPIRED_IN,
   });
 };
 
-exports.getAllUser = async (req, res) => {
+exports.getAllUser = async (req, res, next) => {
   try {
-    let user = await UserModel.find({ _id: { $ne: req.params.id } });
-    res.status(200).json({ mess: "thanh cong", user });
+    let user = await UserModel.find({ _id: { $ne: req.params.id } }).lean();
+    sendSuccess(res, "getUser thành công!", user);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ mess: "server error", error });
+    // console.log(20,error);
+    return next(createError(500, error.message));
   }
 };
 
-exports.createNewUser = async (req, res) => {
+exports.createNewUser = async (req, res, next) => {
   const userName = req.body.userName;
   const gmail = req.body.gmail;
   const password = req.body.password;
-  const mailFormat = /^([a-zA-Z0-9_\.\-])+\@gmail.com/;
   try {
     if (!userName || !gmail || !password) {
-      return res.status(400).json({ mess: "Không để trống thông tin !" });
-    } else if (!mailFormat.test(gmail)) {
-      return res.status(400).json({ mess: "Sai định dạng gmail !" });
+      return next(createError(400, "Không để trống thông tin !"))
+      // return res.status(400).json({ message: "Không để trống thông tin !" });
+    } else if (!MAIL_FORMAT.test(gmail)) {
+      return next(createError(400, "Sai định dạng gmail !"))
+      // return res.status(400).json({ message: "Sai định dạng gmail !" });
     } else if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ mess: "Mật khẩu ít nhất phải dài 6 ký tự !" });
+      return next(createError(400, "Mật khẩu ít nhất phải dài 6 ký tự !"))
+      // return res.status(400).json({ message: "Mật khẩu ít nhất phải dài 6 ký tự !" });
     }
 
     const check = await UserModel.findOne({ userName: userName });
-    if (check) return res.status(400).json({ mess: "username da ton tai" });
+    if (check) {
+        return next(createError(400, "Username đã tồn tại !"))
+      // return res.status(400).json({ message: "Username đã tồn tại !" });
+    }
 
     const checkGmail = await UserModel.findOne({ gmail: gmail });
-    if (checkGmail) return res.status(400).json({ mess: "gmail da ton tai" });
+    if (checkGmail){
+      return next(createError(400, "Gmail đã tồn tại !"))
+      // return res.status(400).json({ message: "Gmail đã tồn tại !" });
+    }
 
     const jwtPassword = await bcrypt.hash(password, 10);
 
@@ -52,87 +59,117 @@ exports.createNewUser = async (req, res) => {
     });
 
     delete user._doc.password;
-    res.status(200).json({ mess: "creater user success", user });
+    sendSuccess(res, "Create user success", user);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ mess: "server error", error });
+    next(createError(500, error.message));
+    // res.status(500).json({ mess: "server error", error });
   }
 };
 
-exports.signIn = async (req, res) => {
+exports.signIn = async (req, res,next) => {
   try {
     const checkUser = await UserModel.findOne({ gmail: req.body.gmail });
-    if (!checkUser) return res.status(400).json("wrong gmail");
+    if (!checkUser){
+      return next(createError(400, "Sai gmail !"))
+      // return res.status(400).json("Sai gmail !");
+    } 
 
     const checkPassWord = await bcrypt.compare(
       req.body.password,
       checkUser.password
     );
-    if (!checkPassWord) return res.status(400).json("wrong password");
+    if (!checkPassWord){
+      return next(createError(400, "Sai password !"))
+      // return res.status(400).json("Sai password !");
+    } 
 
     const token = createToken(checkUser._id);
 
-    res.cookie("chat-app", token, { httpOnly: true, maxAge: maxAge * 1000 });
-    console.log(81, req.cookies["chat-app"]);
-    res.status(200).json({
+    res.cookie("chat-app", token, {httpOnly: true, expiresIn: JWT_EXPIRED_IN});
+    // console.log(81, req.cookies["chat-app"]);
+    // res.status(200).json({
+    //   _id: checkUser._id,
+    //   userName: checkUser.userName,
+    //   gmail: checkUser.gmail,
+    //   avatar: checkUser.avatar,
+    //   token,
+    //   status: true,
+    //   message: "log-in success",
+    // });
+    sendSuccess(res, "Log-in success", {
       _id: checkUser._id,
       userName: checkUser.userName,
       gmail: checkUser.gmail,
       avatar: checkUser.avatar,
       token,
-      status: true,
-      mess: "log-in success",
     });
   } catch (error) {
-    res.status(500).json({ mess: "server error", error });
+    next(createError(500, error.message));
+    // res.status(500).json({ mess: "server error", error });
   }
 };
 
-exports.getOneUser = async (req, res) => {
+exports.getOneUser = async (req, res,next) => {
   try {
     let user = await UserModel.findOne({ _id: req.params.id });
-    res.status(200).json({ mess: "thanh cong", user });
+    sendSuccess( res, 'Lấy thông tin thành công!', user )
+    // res.status(200).json({ mess: "thanh cong", user });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ mess: "server error", error });
+    next(createError( 500, error.message))
+    // res.status(500).json({ mess: "server error", error });
   }
 };
 
-exports.changeInformation = async (req, res) => {
+exports.changeInformation = async (req, res,next) => {
   try {
+    const token = req.cookies["chat-app"];
+    const id = jwt.verify(token, JWT_PASSWORD);
     const user = await UserModel.updateOne(
-      { _id: req.params.id },
-      { phoneNumber: "0123456789" }
+      { _id: id.id },
+      {
+        fullName: req.body.fullName,
+        phoneNumber: req.body.phoneNumber,
+        address: req.body.address,
+        gender: req.body.gender,
+      }
     );
-    res.json(user);
+   sendSuccess(res, 'Sửa thông tin người dùng thành công !', user)
   } catch (error) {
-    res.status(500).json({ mess: "server error", error });
+    next(createError(500, error.message))
+    // res.status(500).json({ mess: "server error", error });
   }
 };
 
-exports.changeUserPassword = async (req, res) => {
+exports.changeUserPassword = async (req, res, next) => {
   try {
     const checkUser = await UserModel.findOne({ gmail: req.body.gmail });
-    if (!checkUser) return res.status(400).json("wrong gmail");
+    if (!checkUser){
+      return next(createError(400, "Sai gmail !"))
+      // return res.status(400).json("Sai gmail !");
+    } 
 
     const checkPassWord = await bcrypt.compareSync(
       req.body.password,
       checkUser.password
     );
-    if (!checkPassWord) return res.status(400).json("wrong password");
+    if (!checkPassWord){
+      return next(createError(400, "Sai password !"))
+      // return res.status(400).json("Sai password !");
+    } 
     const changePass = await UserModel.updateOne(
       { _id: checkUser._id },
       { password: bcrypt.hashSync(req.body.newPassword, 10) }
     );
-    // console.log(123, changePass);
-    res.status(200).json({ mess: "change password thanh cong", changePass });
+
+    // res.status(200).json({ mess: "change password thanh cong", changePass });
+    sendSuccess(res, 'Đổi mật khẩu thành công !', changePass)
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ mess: "server error", error });
+    next(createError(500, error.message))
+    // res.status(500).json({ mess: "server error", error });
   }
 };
 
-exports.logOut = async (req, res) => {
+exports.logOut = async (req, res, next) => {
   try {
     res.clearCookie("chat-app");
   } catch (error) {
@@ -141,21 +178,23 @@ exports.logOut = async (req, res) => {
   }
 };
 
-exports.uploadAvatar = async (req, res) => {
+exports.uploadAvatar = async (req, res, next) => {
   try {
     const token = req.cookies["chat-app"];
     const id = jwt.verify(token, JWT_PASSWORD);
-    const update = await UserModel.updateOne(
+    const update  = await UserModel.updateOne(
       { _id: id.id },
       { avatar: req.file.path }
     );
-    console.log(56, req.file);
-    console.log(57, req.body);
-    if (update.modifiedCount === 0) {
+    // console.log(56, req.file);
+    // console.log(57, req.body);
+    if (update.modifiedCount === 0) {update
       fs.unlinkSync(req.file.filename);
     }
-    res.json({ mess: "ok", update });
+    // res.json({ mess: "ok", update });
+    sendSuccess(res, 'Thay đổi avatar thành công !', update)
   } catch (error) {
-    res.status(500).json("server error" + error);
+    next(createError(500, error.message))
+    // res.status(500).json("server error" + error);
   }
 };
