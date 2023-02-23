@@ -1,7 +1,6 @@
-const { json } = require("express");
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/userModel");
-const { JWT_PASSWORD, JWT_EXPIRED_IN } = process.env;
+const { ACCESS_TOKEN_PRIVATE_KEY, JWT_PASSWORD } = process.env;
 const createError = require("http-errors");
 
 exports.checkLogin = async (req, res, next) => {
@@ -11,7 +10,7 @@ exports.checkLogin = async (req, res, next) => {
   // console.log(1000, id.id);
   try {
     if (!token) {
-      return next(createError(401, "Bạn chưa đăng nhập"));
+      return next(createError(401, "Bạn chưa đăng nhập !"));
     } else {
       const user = await UserModel.findOne({ _id: id.id });
       if (!user) {
@@ -27,6 +26,27 @@ exports.checkLogin = async (req, res, next) => {
 };
 exports.checkAdmin = async (req, res, next) => {
   if (req.user.role !== "4")
-    return next( createError(401, 'Bạn không phải admin, không có quyền truy cập!'))
+    return next(
+      createError(401, "Bạn không phải admin, không có quyền truy cập!")
+    );
   next();
+};
+
+exports.checkAuth = async (req, res, next) => {
+  const token = req.header("chat-app");
+  if (!token)
+    return res.status(403).json({ error: true, message: "Không có token !" });
+  try {
+    const tokenDetails = jwt.verify(token, ACCESS_TOKEN_PRIVATE_KEY);
+    req.user = tokenDetails;
+    next();
+  } catch (err) {
+    console.log(err);
+    res
+      .status(403)
+      .json({
+        error: true,
+        message: "Token không hợp lệ, hoặc đã hết thời hạn !",
+      });
+  }
 };

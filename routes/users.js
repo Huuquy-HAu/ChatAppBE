@@ -2,7 +2,6 @@ var express = require("express");
 var router = express.Router();
 const path = require("path");
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
 const { JWT_PASSWORD } = process.env;
 const {
   getAllUser,
@@ -13,10 +12,11 @@ const {
   uploadAvatar,
   changeInformation,
 } = require("../controller/userController");
-const { checkLogIn, checkAdmin } = require("../middleware/auth");
+const { checkLogIn, checkAdmin, checkAuth } = require("../middleware/auth");
 // const UserModel = require("../models/userModel");
 const multer = require("multer");
 const UserModel = require("../models/userModel");
+const { route } = require("./refreshToken");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
