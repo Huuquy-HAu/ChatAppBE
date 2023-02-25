@@ -14,7 +14,6 @@ const {
   logOut,
 } = require("../controller/userController");
 const { checkLogIn, checkAdmin, checkAuth } = require("../middleware/auth");
-// const UserModel = require("../models/userModel");
 
 const UserModel = require("../models/userModel");
 const storage = multer.diskStorage({
