@@ -1,10 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const path = require("path");
-const jwt = require("jsonwebtoken");
-const fs = require("fs");
 const multer = require("multer");
-const { JWT_PASSWORD } = process.env;
 const {
   getAllUser,
   createNewUser,
@@ -13,8 +10,10 @@ const {
   changeUserPassword,
   uploadAvatar,
   changeInformation,
+  createAccessToken,
+  logOut,
 } = require("../controller/userController");
-const { checkLogIn, checkAdmin } = require("../middleware/auth");
+const { checkLogIn, checkAdmin, checkAuth } = require("../middleware/auth");
 // const UserModel = require("../models/userModel");
 
 const UserModel = require("../models/userModel");
@@ -48,6 +47,8 @@ router.post("/sign-up", createNewUser); //tạo mới user
 router.post("/sign-in", signIn); // đăng nhập
 router.put("/:id", changeUserPassword); // đổi mật khẩu
 router.post("/upload", upload.single("avatar"), uploadAvatar); //đổi avatar
-router.put("/changeInfomation", changeInformation);
+router.put("/changeInfomation", changeInformation); //chỉnh sửa thông tin cá nhân
+router.post("/create-access-token", createAccessToken); //tạo mới accessToken
+router.delete("/logout", logOut); //đăng xuất
 
 module.exports = router;
