@@ -12,11 +12,11 @@ const UserSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
-    avatar:{
-      type:String,
-      default:'https://class.nodemy.vn/api/public/images/logo.png?1675910771501'
-    }
-    ,
+    avatar: {
+      type: String,
+      default:
+        "https://class.nodemy.vn/api/public/images/logo.png?1675910771501",
+    },
     password: {
       type: String,
       unique: true,
@@ -32,6 +32,22 @@ const UserSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    fullName: {
+      type: String,
+      default: "",
+    },
+    address: {
+      type: String,
+      default: "",
+    },
+    phoneNumber: {
+      type: String,
+      default: "",
+    },
+    gender: {
+      type: String,
+      default: "",
+    },
   },
   { collection: "User" }
 );

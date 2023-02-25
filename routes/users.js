@@ -1,20 +1,20 @@
 var express = require("express");
 var router = express.Router();
 const path = require("path");
-const jwt = require("jsonwebtoken");
-const fs = require("fs");
-const { JWT_PASSWORD } = process.env;
+const multer = require("multer");
 const {
   getAllUser,
   createNewUser,
   signIn,
   getOneUser,
   changeUserPassword,
-  updateProfile,
+  uploadAvatar,
+  changeInformation,
+  createAccessToken,
+  logOut,
 } = require("../controller/userController");
-const { checkLogIn, checkAdmin } = require("../middleware/auth");
-// const UserModel = require("../models/userModel");
-const multer = require("multer");
+const { checkLogIn, checkAdmin, checkAuth } = require("../middleware/auth");
+
 const UserModel = require("../models/userModel");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -45,25 +45,9 @@ router.get("/:id", getOneUser); //get one user
 router.post("/sign-up", createNewUser); //tạo mới user
 router.post("/sign-in", signIn); // đăng nhập
 router.put("/:id", changeUserPassword); // đổi mật khẩu
-// route.put('/upload-profile',uploadProfile);//đổi avatar
-router.post("/upload", upload.single("avatar"), async function (req, res) {
-  try {
-    const token = req.cookies["chat-app"];
-    const id = jwt.verify(token, JWT_PASSWORD);
-    const update = await UserModel.updateOne(
-      { _id: id.id },
-      { avatar: req.file.filename }
-    );
-    console.log(56, req.file);
-    console.log(57, req.body);
-    if (update.modifiedCount === 0) {
-      fs.unlinkSync(req.file.filename);
-    }
-    res.json({ mess: "ok", update });
-  } catch (error) {
-    res.status(500).json("server error" + error);
-  }
-});
-// router.put("/profile/:id", updateProfile);
+router.post("/upload", upload.single("avatar"), uploadAvatar); //đổi avatar
+router.put("/changeInfomation", changeInformation); //chỉnh sửa thông tin cá nhân
+router.post("/create-access-token", createAccessToken); //tạo mới accessToken
+router.delete("/logout", logOut); //đăng xuất
 
 module.exports = router;

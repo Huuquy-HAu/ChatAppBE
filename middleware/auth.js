@@ -1,31 +1,53 @@
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/userModel");
-const { JWT_PASSWORD, JWT_EXPIRED_IN } = process.env;
+const { ACCESS_TOKEN_PRIVATE_KEY, JWT_PASSWORD } = process.env;
+const createError = require("http-errors");
 
 exports.checkLogin = async (req, res, next) => {
-  const token = req.cookies["chat-app"];
-  console.log(77777777, token);
-  if (token) {
-    jwt.verify(token, JWT_PASSWORD, async (err, decodedToken) => {
-      if (err) {
-        // res.redirect("/users/sign-in");
-        return res.status(500).json({ mess: "chưa đăng nhập!" });
+  try {
+    const token = req.cookies["chat-app"];
+    const id = jwt.verify(token, JWT_PASSWORD);
+    if (!token) {
+      return next(createError(401, "Bạn chưa đăng nhập !"));
+    } else {
+      const user = await UserModel.findOne({ _id: id.id });
+      if (!user) {
+        return next(createError(401, " Không tìm thấy thông tin người dùng !"));
       } else {
-        const user = await UserModel.findOne({ _id: decodedToken.id });
-        if (user) res.json({ status: true });
         req.user = user;
         next();
       }
-    });
-  } else {
-    // res.redirect("/users/sign-in");
-    return res.status(500).json({ mess: "chưa đăng nhập!" });
+    }
+  } catch (error) {
+    if(error && error.message === 'invalid signature'){
+      return next(createError(401, error.message));
+    }
+    return next(createError(500, error.message));
   }
 };
 exports.checkAdmin = async (req, res, next) => {
   if (req.user.role !== "4")
-    return res
-      .status(404)
-      .json({ mess: "Bạn không phải admin không có quyền truy cập !" });
+    return next(
+      createError(401, "Bạn không phải admin, không có quyền truy cập!")
+    );
   next();
+};
+
+exports.checkAuth = async (req, res, next) => {
+  const token = req.header("chat-app");
+  if (!token)
+    return res.status(403).json({ error: true, message: "Không có token !" });
+  try {
+    const tokenDetails = jwt.verify(token, ACCESS_TOKEN_PRIVATE_KEY);
+    req.user = tokenDetails;
+    next();
+  } catch (err) {
+    console.log(err);
+    res
+      .status(403)
+      .json({
+        error: true,
+        message: "Token không hợp lệ, hoặc đã hết thời hạn !",
+      });
+  }
 };

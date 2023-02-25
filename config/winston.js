@@ -26,7 +26,7 @@ const options = {
 // Create the logger
 exports.logger = winston.createLogger(options);
 
-// logger.error(message): ghi lỗi cấp độ cao nhất.
+// logger.error(message):  ghi lỗi cấp độ cao nhất.
 // logger.warn(message): ghi lỗi cấp độ trung bình.
 // logger.info(message): ghi thông tin.
 // logger.verbose(message): ghi thông tin chi tiết.
