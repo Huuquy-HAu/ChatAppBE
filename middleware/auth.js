@@ -4,9 +4,9 @@ const { ACCESS_TOKEN_PRIVATE_KEY, JWT_PASSWORD } = process.env;
 const createError = require("http-errors");
 
 exports.checkLogin = async (req, res, next) => {
-  const token = req.cookies["chat-app"];
-  const id = jwt.verify(token, JWT_PASSWORD);
   try {
+    const token = req.cookies["chat-app"];
+    const id = jwt.verify(token, JWT_PASSWORD);
     if (!token) {
       return next(createError(401, "Bạn chưa đăng nhập !"));
     } else {
@@ -19,6 +19,9 @@ exports.checkLogin = async (req, res, next) => {
       }
     }
   } catch (error) {
+    if(error && error.message === 'invalid signature'){
+      return next(createError(401, error.message));
+    }
     return next(createError(500, error.message));
   }
 };
