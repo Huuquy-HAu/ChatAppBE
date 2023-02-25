@@ -8,11 +8,12 @@ router.get('/roomChat',checkLogin,getAllRoomChatController)
 //Post create chatRoom
 router.post('/roomChat', checkLogin, postRoomChatController)
 
+//Remove use in chatRoom 
+router.patch('/roomChat',checkLogin,removeUserRoomController)
+
 //Pacth updateUser in chatRoom
 router.patch('/roomChat/updateUser/:idRoomchat',updateUserRoomChatController)
 
-//Remove use in chatRoom 
-router.patch('/roomChat/removeUser/:idRoomChat',removeUserRoomController)
 
 //Delete chatRoom
 router.delete('/roomChat',checkLogin,deleteRoomChatController)

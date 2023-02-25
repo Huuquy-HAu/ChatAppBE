@@ -48,6 +48,6 @@ router.post("/sign-up", createNewUser); //tạo mới user
 router.post("/sign-in", signIn); // đăng nhập
 router.put("/:id", changeUserPassword); // đổi mật khẩu
 router.post("/upload", upload.single("avatar"), uploadAvatar); //đổi avatar
-router.put("/changeInfomation/:id", changeInformation);
+router.put("/changeInfomation", changeInformation);
 
 module.exports = router;

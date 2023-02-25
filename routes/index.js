@@ -4,7 +4,6 @@ var router = express.Router();
 
 /* GET home page. */
 router.get("/", checkLogin, (req, res) => {
-  console.log(">>> console.log file index.js", req.user._id.toString());
   res.json(req.user);
 });
 

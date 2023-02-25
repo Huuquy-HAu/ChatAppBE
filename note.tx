@@ -10,5 +10,6 @@ update chat đôi ko thể thay đổi user
 -------------logic my --------------
 
 
-
-
+------------user thoát nhóm (1:1)------------
+User delete chính id cuủa mình (thoát) khỏi listusser
+Admin xoá các thành viên trong nhóm

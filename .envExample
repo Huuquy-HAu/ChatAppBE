@@ -1,0 +1,7 @@
+PORT = 3000
+
+MONGOOSE_URL = mongodb://127.0.0.1/ChatApp
+
+JWT_PASSWORD = password
+
+JWT_EXPIRED_IN = 30d
