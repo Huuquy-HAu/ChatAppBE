@@ -10,7 +10,6 @@ const {
 const generateTokens = async (user) => {
   try {
     const payload = { _id: user._id };
-
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_PRIVATE_KEY, {
       expiresIn: ACCESS_TOKEN_TIME,
     });

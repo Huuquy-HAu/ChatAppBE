@@ -4,7 +4,6 @@ const { REFRESH_TOKEN_PRIVATE_KEY } = process.env;
 
 const verifyRefreshToken = (refreshToken) => {
   const privateKey = REFRESH_TOKEN_PRIVATE_KEY;
-
   return new Promise((resolve, reject) => {
     UserToken.findOne({ token: refreshToken }, (err, doc) => {
       console.log(999, doc);

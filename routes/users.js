@@ -11,12 +11,13 @@ const {
   changeUserPassword,
   uploadAvatar,
   changeInformation,
+  createAccessToken,
+  logOut,
 } = require("../controller/userController");
 const { checkLogIn, checkAdmin, checkAuth } = require("../middleware/auth");
 // const UserModel = require("../models/userModel");
 const multer = require("multer");
 const UserModel = require("../models/userModel");
-const { route } = require("./refreshToken");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
@@ -47,6 +48,8 @@ router.post("/sign-up", createNewUser); //tạo mới user
 router.post("/sign-in", signIn); // đăng nhập
 router.put("/:id", changeUserPassword); // đổi mật khẩu
 router.post("/upload", upload.single("avatar"), uploadAvatar); //đổi avatar
-router.put("/changeInfomation", changeInformation);
+router.put("/changeInfomation", changeInformation); //chỉnh sửa thông tin cá nhân
+router.post("/create-access-token", createAccessToken); //tạo mới accessToken
+router.delete("/logout", logOut); //đăng xuất
 
 module.exports = router;
